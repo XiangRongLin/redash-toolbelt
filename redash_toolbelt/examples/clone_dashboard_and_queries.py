@@ -31,32 +31,30 @@ def duplicate(client, slug, prefix=None):
     old_vs_new_query_pairs = [
         {
             "old_query": client._get(f"api/queries/{old_query.get('id')}").json(),
-            "new_query": client.duplicate_query(
-                old_query.get("id"), new_name=" ".join([prefix + old_query.get("name")])
-            ),
+            # "new_query": client.duplicate_query(
+            #     old_query.get("id"), new_name=" ".join([prefix + old_query.get("name")])
+            # ),
         }
         for old_query in queries_to_duplicate.values()
     ]
 
     # Compare old visualizations to new ones
     # Create a mapping of old visualization IDs to new ones
-    old_viz_vs_new_viz = {
-        old_viz.get("id"): new_viz.get("id")
-        for pair in old_vs_new_query_pairs
-        for old_viz in pair["old_query"].get("visualizations")
-        for new_viz in pair["new_query"].get("visualizations")
-        if old_viz.get("options") == new_viz.get("options")
-    }
+    # old_viz_vs_new_viz = {
+    #     old_viz.get("id"): new_viz.get("id")
+    #     for pair in old_vs_new_query_pairs
+    #     for old_viz in pair["old_query"].get("visualizations")
+    #     for new_viz in pair["new_query"].get("visualizations")
+    #     if old_viz.get("options") == new_viz.get("options")
+    # }
 
     # This is a version of the same logic from Redash.duplicate_dashboard
     # But it substitutes in the new visualiation ID pointing at the copied query.
     for widget in current_dashboard["widgets"]:
-        visualization_id = None
         if "visualization" in widget:
-            visualization_id = old_viz_vs_new_viz.get(widget["visualization"]["id"])
-        client.create_widget(
-            new_dashboard["id"], visualization_id, widget["text"], widget["options"]
-        )
+            client.create_widget(
+                new_dashboard["id"], widget["visualization"]["id"], widget["text"], widget["options"]
+            )
 
     return new_dashboard
 
