@@ -51,10 +51,12 @@ def duplicate(client, slug, prefix=None):
     # This is a version of the same logic from Redash.duplicate_dashboard
     # But it substitutes in the new visualiation ID pointing at the copied query.
     for widget in current_dashboard["widgets"]:
+        visualization_id = None
         if "visualization" in widget:
-            client.create_widget(
-                new_dashboard["id"], widget["visualization"]["id"], widget["text"], widget["options"]
-            )
+            visualization_id = widget["visualization"]["id"]
+        client.create_widget(
+            new_dashboard["id"], visualization_id, widget["text"], widget["options"]
+        )
 
     return new_dashboard
 
